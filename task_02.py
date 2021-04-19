@@ -4,7 +4,8 @@ import requests
 import pygame
 import shutil
 import os
-from config import *
+SIZE = (600, 450)
+FPS = 60
 
 
 class Map:
@@ -30,8 +31,8 @@ class Map:
         }
         response = requests.get("http://static-maps.yandex.ru/1.x/",
                                 params=map_params)
-        Image.open(BytesIO(response.content)).save(PATH + 'temp.png')
-        return pygame.image.load(PATH + 'temp.png')
+        Image.open(BytesIO(response.content)).save('temp/' + 'temp.png')
+        return pygame.image.load('temp/' + 'temp.png')
 
     def show(self, surf):
         surf.blit(self.image, (0, 0))
