@@ -4,6 +4,7 @@ import requests
 import pygame
 import shutil
 import os
+
 SIZE = (600, 450)
 FPS = 60
 
@@ -14,7 +15,7 @@ class Map:
         self.coordinates = coordinates
         self.zoom = zoom
         self.image = self.get_map()
-        self.borders = (0, 17)
+        self.borders = (0, 15)
 
     def set_params(self, coordinates, zoom):
         self.coordinates = coordinates
