@@ -50,7 +50,7 @@ class Map:
 
 if __name__ == '__main__':
     try:
-        os.mkdir(PATH)
+        os.mkdir('temp/')
     except FileExistsError:
         pass
 
@@ -71,4 +71,4 @@ if __name__ == '__main__':
         pygame.display.flip()
         clock.tick(FPS)
     pygame.quit()
-    shutil.rmtree(PATH, ignore_errors=True)
+    shutil.rmtree('temp/', ignore_errors=True)
