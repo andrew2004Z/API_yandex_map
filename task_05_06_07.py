@@ -6,7 +6,6 @@ import shutil
 import os
 SIZE = (512, 256)
 FPS = 60
-PATH = 'temp/'
 BLACK = (0, 0, 0)
 APIKEY = "40d1649f-0493-4b70-98ba-98533de7710b"
 
@@ -70,6 +69,11 @@ class Map:
         surf.blit(self.image, (0, 0))
 
         font = pygame.font.Font(None, 24)
+        txt_surface = font.render("Сброс метки", True, pygame.Color("black"))
+        reset_box.w = txt_surface.get_width() + 10
+        pygame.draw.rect(surf, (200, 200, 200), reset_box)
+        surf.blit(txt_surface, (reset_box.x + 5, reset_box.y + 6))
+
         txt_surface = font.render(self.text, True, color)
         width = max(200, txt_surface.get_width() + 10)
         input_box.w = width
