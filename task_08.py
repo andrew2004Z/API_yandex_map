@@ -22,7 +22,7 @@ def find_coordinates_by_name(name):
                                      ["featureMember"][0]["GeoObject"]["Point"]["pos"]).split())
         return s, 1
     except IndexError:
-        return "71.430411,51.128207", 0  # оп, пасхалочка
+        return "71.430411,51.128207", 0
 
 
 def find_full_address_by_name(name):
