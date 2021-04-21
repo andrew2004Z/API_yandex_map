@@ -20,10 +20,25 @@ def find_coordinates_by_name(name):
         response = requests.get("http://geocode-maps.yandex.ru/1.x/", params=params)
         s = ",".join((response.json()["response"]["GeoObjectCollection"]
                                      ["featureMember"][0]["GeoObject"]["Point"]["pos"]).split())
-        return s
+        return s, 1
     except IndexError:
-        print("Адресс не найден!!!")
-        return "71.430411,51.128207"
+        return "71.430411,51.128207", 0  # оп, пасхалочка
+
+
+def find_full_address_by_name(name):
+    try:
+        params = {
+            "geocode": "+".join(name.split(" ")),
+            "apikey": APIKEY,
+            "results": "1",
+            "format": "json",
+        }
+        response = requests.get("http://geocode-maps.yandex.ru/1.x/", params=params)
+        s = (response.json()["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+                            ["metaDataProperty"]["GeocoderMetaData"]["Address"]["formatted"])
+        return s
+    except Exception:
+        return "Упс, что-то пошло не так"
 
 
 class Map:
@@ -35,6 +50,7 @@ class Map:
 
         self.text = ""
         self.metka = ""
+        self.full_address = ""
 
         self.image = self.get_map(firstly=True)
 
@@ -69,10 +85,17 @@ class Map:
         surf.blit(self.image, (0, 0))
 
         font = pygame.font.Font(None, 24)
+
         txt_surface = font.render("Сброс метки", True, pygame.Color("black"))
         reset_box.w = txt_surface.get_width() + 10
         pygame.draw.rect(surf, (200, 200, 200), reset_box)
         surf.blit(txt_surface, (reset_box.x + 5, reset_box.y + 6))
+
+        color_address = "white" if self.full_address == "" else "black"
+        txt_surface = font.render(self.full_address, True, pygame.Color("black"))
+        output_box.w = max(200, txt_surface.get_width() + 10)
+        pygame.draw.rect(surf, color_address, output_box, 3)
+        surf.blit(txt_surface, (output_box.x + 5, output_box.y + 6))
 
         txt_surface = font.render(self.text, True, color)
         width = max(200, txt_surface.get_width() + 10)
@@ -128,14 +151,17 @@ class Map:
             self.map_type = new_type
             self.image = self.get_map()
 
-    def to_adress(self):
+    def to_adres(self):
         coordinates = find_coordinates_by_name(self.text)
-        self.metka = coordinates + ",pm2rdl"
-        self.set_params([float(coor) for coor in coordinates.split(",")], 5)
+        self.full_address = "Упс! Что-то пошло не так" if not coordinates[1] else find_full_address_by_name(self.text)
+        self.metka = coordinates[0] + ",pm2rdl"
+        self.set_params([float(coor) for coor in coordinates[0].split(",")], 5)
         self.image = self.get_map()
 
     def reset(self):
+        self.text = ""
         self.metka = ""
+        self.full_address = ""
         self.image = self.get_map()
 
 
@@ -149,7 +175,7 @@ if __name__ == '__main__':
     print('Чтобы перейти по адрессу, нажмите Enter')
 
     pygame.init()
-    screen = pygame.display.set_mode([SIZE[0], SIZE[1] + 75])
+    screen = pygame.display.set_mode([SIZE[0], SIZE[1] + 105])
     pygame.display.set_caption('Map')
     clock = pygame.time.Clock()
     running = True
@@ -160,6 +186,7 @@ if __name__ == '__main__':
 
     input_box = pygame.Rect(25, 265, 140, 26)
     reset_box = pygame.Rect(25, 300, 70, 26)
+    output_box = pygame.Rect(25, 335, 140, 23)
 
     operator = Map([34.11, 66.56], 5)
 
@@ -170,7 +197,7 @@ if __name__ == '__main__':
             elif event.type == pygame.KEYDOWN:
                 if active:
                     if event.key == pygame.K_RETURN:
-                        operator.to_adress()
+                        operator.to_adres()
                         operator.text = ''
                     elif event.key == pygame.K_BACKSPACE:
                         operator.text = operator.text[:-1]
